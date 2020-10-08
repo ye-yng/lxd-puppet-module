@@ -19,7 +19,7 @@ define lxd::image(
         'present': {
             # unfortunately no way to import image from stdin
             exec { "lxd image present ${repo_url}/${image_file}":
-                command => "rm -f /tmp/puppet-download-lxd-image && wget -qO - '${repo_url}/${image_file}' > /tmp/puppet-download-lxd-image && lxc image import /tmp/puppet-download-lxd-image --alias '${image_alias}' && rm -f /tmp/puppet-download-lxd-image",  # lint:ignore:140chars
+                command => "rm -f /tmp/lxd.tar.xz /tmp/rootfs.squashfs && wget -qO - '${repo_url}/${image_file}/lxd.tar.xz' > /tmp/lxd.tar.xz && wget -qO - '${repo_url}/${image_file}/rootfs.squashfs' > /tmp/rootfs.squashfs  && lxc image import /tmp/lxd.tar.xz /tmp/rootfs.squashfs --alias '${image_alias}' && rm -f /tmp/lxd.tar.xz /tmp/rootfs.squashfs",  # lint:ignore:140chars
                 unless  => "lxc image ls -cl --format csv | grep '^${image_alias}$'",
                 timeout => 600,
             }
