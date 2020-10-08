@@ -13,6 +13,8 @@ define lxd::image(
     validate_re($image_file, "[^;']+")
     validate_re($image_alias, "[^;']+")
 
+    Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ] }
+
     case $ensure {
         'present': {
             # unfortunately no way to import image from stdin
