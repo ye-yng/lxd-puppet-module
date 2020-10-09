@@ -18,15 +18,23 @@ define lxd::image(
     case $ensure {
         # downloads the image from LXD's official server
         'official': {
-            exec { "lxd image present ${repo_url}/${image_file}":
+            exec { "lxd official image present ${repo_url}/${image_file}":
                 command => "rm -f /tmp/lxd.tar.xz /tmp/rootfs.squashfs && wget -qO - '${repo_url}/${image_file}/lxd.tar.xz' > /tmp/lxd.tar.xz && wget -qO - '${repo_url}/${image_file}/rootfs.squashfs' > /tmp/rootfs.squashfs  && lxc image import /tmp/lxd.tar.xz /tmp/rootfs.squashfs --alias '${image_alias}' && rm -f /tmp/lxd.tar.xz /tmp/rootfs.squashfs",  # lint:ignore:140chars
                 unless  => "lxc image ls -cl --format csv | grep '^${image_alias}$'",
                 timeout => 600,
             }
         }
 
+        'official-vm': {
+            exec { "lxd official vm image present ${repo_url}/${image_file}":
+                command => "rm -f /tmp/lxd.tar.xz /tmp/disk.qcow2 && wget -qO - '${repo_url}/${image_file}/lxd.tar.xz' > /tmp/lxd.tar.xz && wget -qO - '${repo_url}/${image_file}/disk.qcow2' > /tmp/disk.qcow2 && lxc image import /tmp/lxd.tar.xz /tmp/disk.qcow2 --alias '${image_alias}' && rm -f /tmp/lxd.tar.xz /tmp/disk.qcow2",
+                unless  => "lxc image ls -cl --format csv | grep '^${image_alias}$'",
+                timeout => 600,
+            }
+        }
+
         'present': {
-            exec {
+            exec { "lxd image present ${repo_url}/${image_file}":
                 command => "rm -f /tmp/puppet-download-lxd-image && wget -qO - '${repo_url}/${image_file}' > /tmp/puppet-download-lxd-image && lxc image import /tmp/puppet-download-lxd-image --alias '${image_alias}' && rm -f /tmp/puppet-download-lxd-image",
                 unless  => "lxc image ls -cl --format csv | grep '^${image_alias}$'",
                 timeout => 600,
