@@ -46,8 +46,8 @@ Puppet::Type.type(:lxd_container).provide(:container) do
 
     # checking if the resource exists
     def exists?
-        containers_array = get_api_node(['containers'])
-        return containers_array.include? return_api_path(['containers', resource[:name]])
+        containers_array = get_api_node(['instances'])
+        return containers_array.include? return_api_path(['instances', resource[:name]])
     end
 
     # ensure absent handling
@@ -56,7 +56,7 @@ Puppet::Type.type(:lxd_container).provide(:container) do
            Puppet.debug("Container #{resource[:name]} is running need to stop it first")
            self.state = 'stopped'
         end
-        return delete_api_node(['containers', resource[:name]])
+        return delete_api_node(['instances', resource[:name]])
     end
 
     # ensure present handling
@@ -67,18 +67,19 @@ Puppet::Type.type(:lxd_container).provide(:container) do
             'profiles' => resource[:profiles],
             'config' => resource[:config],
             'devices' => resource[:devices],
+	    'type' => resource[:type],
             'source' => {
                 'type' => 'image',
                 'alias' => resource[:image],
             },
         }
-        create_api_node(['containers'], call_body)
+        create_api_node(['instances'], call_body)
         self.state = resource[:state]
     end
 
     # getter method for property config
     def config
-        container_hash = get_api_node(['containers', resource[:name]])
+        container_hash = get_api_node(['instances', resource[:name]])
         config_hash = container_hash['config']
         managed_keys = resource[:config].keys
         # this is subhash of all config hash with only managed keys, values
@@ -88,24 +89,24 @@ Puppet::Type.type(:lxd_container).provide(:container) do
 
     # setter method for property config
     def config=(config_hash)
-        modify_api_node(['containers', resource[:name]], {'config' => config_hash})
+        modify_api_node(['instances', resource[:name]], {'config' => config_hash})
     end
 
     # getter method for property config
     def devices
-        container_hash = get_api_node(['containers', resource[:name]])
+        container_hash = get_api_node(['instances', resource[:name]])
         devices_hash = container_hash['devices']
         return devices_hash
     end
 
     # setter method for property config
     def devices=(config_hash)
-        modify_api_node(['containers', resource[:name]], {'devices' => config_hash})
+        modify_api_node(['instances', resource[:name]], {'devices' => config_hash})
     end
 
     # getter method for property state
     def state
-        container_state = get_api_node(['containers', resource[:name], 'state'])
+        container_state = get_api_node(['instances', resource[:name], 'state'])
         case container_state['status']
         when 'Running'
             return 'started'
@@ -127,7 +128,7 @@ Puppet::Type.type(:lxd_container).provide(:container) do
         else 
             Puppet.debug("Unsupported state!")
         end
-        operation = put_api_node(['containers', resource[:name], 'state'], {action: action, timeout: 30})
+        operation = put_api_node(['instances', resource[:name], 'state'], {action: action, timeout: 30})
         Puppet.debug("Operation: #{operation}")
         if operation['status_code'] == 200
             return true
@@ -138,12 +139,12 @@ Puppet::Type.type(:lxd_container).provide(:container) do
 
     # getter method for property profiles
     def profiles
-        return get_api_node(['containers', resource[:name]])['profiles']
+        return get_api_node(['instances', resource[:name]])['profiles']
     end
 
     # setter method for property profiles
     def profiles=(profiles)
-        return modify_api_node(['containers', resource[:name]], {'profiles' => profiles})
+        return modify_api_node(['instances', resource[:name]], {'profiles' => profiles})
     end
 
 end

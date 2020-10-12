@@ -11,6 +11,7 @@ describe Puppet::Type.type(:lxd_container).provider(:container) do
             {
                 :ensure   => 'present',
                 :name     => 'container01',
+		:type     => 'container',
                 :config   => {},
                 :devices  => {},
                 :profiles => ['default'],

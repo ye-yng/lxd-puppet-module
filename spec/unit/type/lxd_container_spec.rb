@@ -5,7 +5,7 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:lxd_container), 'when validating attributes' do
- [:name, :image].each do |param|
+ [:name, :image, :type].each do |param|
     it "should have a #{param} parameter" do
       expect(Puppet::Type.type(:lxd_container).attrtype(param)).to eq(:param)
     end

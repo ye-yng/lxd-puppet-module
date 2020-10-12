@@ -15,6 +15,10 @@ Puppet::Type.newtype(:lxd_container) do
         desc "Image for container creation"
     end
 
+    newparam(:type) do
+        desc "Instance type"
+    end
+
     newproperty(:config, :hash_matching => :all) do
         desc "Array of config values"
         validate do |value|

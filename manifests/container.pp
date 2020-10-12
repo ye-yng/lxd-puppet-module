@@ -5,6 +5,7 @@
 
 define lxd::container(
     $image,
+    $type,
     $config = {},
     $devices = {},
     $profiles = ['default'],
@@ -20,6 +21,7 @@ define lxd::container(
         devices  => $devices,
         profiles => $profiles,
         image    => $image,
+        type     => $type,
     }
 
     case $ensure {
