@@ -90,7 +90,12 @@ Puppet::Type.type(:lxd_storage).provide(:storage) do
     # setter method for property config
     def config=(config_hash)
         storage_hash = get_api_node(['storage-pools', resource[:name]])
-        call_body = {
+        tmp_config_hash = storage_hash['config']
+	# For scenarios in which the source is not passed during storage creation
+	if not config_hash.key?("source")
+	    config_hash[:source] = tmp_config_hash['source']
+	end
+	call_body = {
             'config' => config_hash,
         }
         put_api_node(['storage-pools', resource[:name]], call_body)
