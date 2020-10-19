@@ -6,11 +6,18 @@
 define lxd::container(
     $image,
     $type,
+    $set_ip,
     $config = {},
     $devices = {},
     $profiles = ['default'],
     $state = 'started',
     $ensure = 'present',
+    $ip_address = undef,
+    $netmask = undef,
+    $gateway = undef,
+    $dns1 = undef,
+    $dns2 = undef,
+    $dns3 = undef,
 ) {
     # creating lxd container
 
@@ -23,7 +30,17 @@ define lxd::container(
         image    => $image,
         type     => $type,
     }
-
+   
+    -> lxd::network { 'set ip':
+        set_ip => $set_ip,
+        ip_address => $ip_address,
+        netmask => $netmask,
+        gateway => $gateway,
+        dns1 => $dns1,
+        dns2 => $dns2,
+        dns3 => $dns3,
+    }
+ 
     case $ensure {
         'present': {
             Lxd::Image[$image]
