@@ -1,12 +1,10 @@
 define lxd::network (
     $set_ip,
+    $instance_name,
     $ip_address = undef,
     $netmask = undef,
     $gateway = undef,
-    $dns1 = undef,
-    $dns2 = undef,
-    $dns3 = undef,
-
+    $dns = [],
 ){
     if $set_ip == 'true' {
       if $ip_address == undef {
@@ -15,28 +13,21 @@ define lxd::network (
         fail("No netmask given.")
       } elsif $gateway == undef {
         fail("No gateway given.")
-      } elsif $dns1 == undef {
+      } elsif length($dns) == 0 {
         fail("No default DNS server given.")
       }
 
-      if $dns3 {
-       exec { 'lxd-network':
-         command => 'systemctl daemon-reload',
-         path    => '/usr/local/AS/bin',
-       }
+      if length($dns) > 3 {
+        notify{"warning":
+          message => "Warning: Maximum number of DNS servers accepted is 3.",
+        }
+      }
 
-     } elsif $dns2 {
-       exec { 'systemctl_daemon_reload':
-         command => 'systemctl daemon-reload',
-         path    => '/usr/local/AS/bin',
-       }
-     } else {
-       exec { 'systemctl_daemon_reload':
-         command => 'systemctl daemon-reload',
-         path    => '/usr/local/AS/bin',
-       }
-     }
+      $parsed_dns = join($dns,' ')
 
+      exec { 'lxd-network':
+        command => "/usr/local/AS/bin/lxd-network.sh ${instance_name} ${ip_address} ${netmask} ${gateway} ${parsed_dns}",
+      }
     } elsif $set_ip == 'false' {
       #do nothing
     } else {

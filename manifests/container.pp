@@ -15,12 +15,9 @@ define lxd::container(
     $ip_address = undef,
     $netmask = undef,
     $gateway = undef,
-    $dns1 = undef,
-    $dns2 = undef,
-    $dns3 = undef,
+    $dns = [],
 ) {
     # creating lxd container
-
     lxd_container { $name:
         ensure   => $ensure,
         state    => $state,
@@ -31,14 +28,13 @@ define lxd::container(
         type     => $type,
     }
    
-    -> lxd::network { 'set ip':
+    -> lxd::network { "set ip":
+        instance_name => $name,
         set_ip => $set_ip,
         ip_address => $ip_address,
         netmask => $netmask,
         gateway => $gateway,
-        dns1 => $dns1,
-        dns2 => $dns2,
-        dns3 => $dns3,
+        dns => $dns,
     }
  
     case $ensure {
